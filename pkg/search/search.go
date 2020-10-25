@@ -35,12 +35,14 @@ func All(ctx context.Context, phrаse string, files []string) <-chan []Result {
 
 	for i := 0; i < j; i++ {
 		wg.Add(1)
-		go func(ctx context.Context, fileName string, i int, ch chan<- []Result) {
+		go func(ctx context.Context, fileName string, ch chan<- []Result) {
 			defer wg.Done()
 
-			FindAllPhraseInFile(phrаse, fileName)
+			channel := FindAllPhraseInFile(phrаse, fileName)
 
-		}(ctx, files[i], i, ch)
+			ch <- channel
+
+		}(ctx, files[i], ch)
 	}
 
 	go func() {

@@ -40,6 +40,10 @@ func All(ctx context.Context, phrаse string, files []string) <-chan []Result {
 
 			channel := FindAllPhraseInFile(phrаse, fileName)
 
+			if len(channel) <= 0 {
+				return
+			}
+
 			ch <- channel
 
 		}(ctx, files[i], ch)

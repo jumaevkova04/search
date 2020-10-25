@@ -3,6 +3,4 @@ package main
 func main() {
 	// 	a := search.FindAllPhraseInFile("name", "src/text.txt")
 	// 	fmt.Println(a)
-	// 	b := search.FindAnyPhraseInFile("name", "src/text.txt")
-	// 	fmt.Println(b)
 }

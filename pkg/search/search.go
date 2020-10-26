@@ -87,3 +87,74 @@ func FindAllPhraseInFile(phrase string, fileName string) []Result {
 
 	return result
 }
+
+// Any ищет любое одно вхождения pharse в текстовых файлах files.
+func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
+	ch := make(chan Result)
+
+	var j int
+	for j = range files {
+		j++
+	}
+
+	wg := sync.WaitGroup{}
+
+	ctx, cancel := context.WithCancel(ctx)
+
+	for i := 0; i < j; i++ {
+		wg.Add(1)
+		go func(ctx context.Context, fileName string, ch chan<- Result) {
+			defer wg.Done()
+
+			select {
+			case <-ctx.Done():
+				log.Print("cancel")
+				return
+			default:
+				channel := FindAnyPhraseInFile(phrаse, fileName)
+				ch <- channel
+			}
+
+		}(ctx, files[i], ch)
+	}
+
+	<-ch
+	cancel()
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+		cancel()
+	}()
+
+	return ch
+}
+
+// FindAnyPhraseInFile ...
+func FindAnyPhraseInFile(phrase string, fileName string) Result {
+	var result Result
+
+	file, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		log.Print(err)
+		return result
+	}
+
+	text := string(file)
+
+	lines := strings.Split(text, "\n")
+
+	for i, line := range lines {
+		// i++
+		if strings.Contains(line, phrase) {
+			return Result{
+				Phrase:  phrase,
+				Line:    line,
+				LineNum: int64(i + 1),
+				ColNum:  int64(strings.Index(line, phrase)) + 1,
+			}
+		}
+	}
+
+	return result
+}

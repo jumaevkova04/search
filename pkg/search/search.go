@@ -58,50 +58,6 @@ func All(ctx context.Context, phrаse string, files []string) <-chan []Result {
 	return ch
 }
 
-// Any ищет любое одно вхождения pharse в текстовых файлах files.
-func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
-	ch := make(chan Result)
-
-	// var j int
-	// for j = range files {
-	// 	j++
-	// }
-
-	wg := sync.WaitGroup{}
-
-	ctx, cancel := context.WithCancel(ctx)
-
-	for i := 0; i < len(files); i++ {
-		wg.Add(1)
-		go func(ctx context.Context, fileName string, i int, ch chan<- Result) {
-			defer wg.Done()
-
-			select {
-			case <-ctx.Done():
-				log.Println("canceled", i)
-				// return
-			default:
-				channel := FindAnyPhraseInFile(phrаse, fileName)
-
-				if (Result{}) != channel {
-					ch <- channel
-				}
-			}
-		}(ctx, files[i], i, ch)
-	}
-
-	<-ch
-	cancel()
-
-	go func() {
-		defer close(ch)
-		wg.Wait()
-		cancel()
-	}()
-
-	return ch
-}
-
 // FindAllPhraseInFile ...
 func FindAllPhraseInFile(phrase string, fileName string) []Result {
 	result := []Result{}
@@ -130,6 +86,55 @@ func FindAllPhraseInFile(phrase string, fileName string) []Result {
 	}
 
 	return result
+}
+
+// Any ищет любое одно вхождения pharse в текстовых файлах files.
+func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
+	ch := make(chan Result)
+
+	var j int
+	for j = range files {
+		j++
+	}
+
+	wg := sync.WaitGroup{}
+	result := Result{}
+
+	for i := 0; i < j; i++ {
+
+		file, err := ioutil.ReadFile(files[i])
+		if err != nil {
+			log.Print(err)
+		}
+
+		text := string(file)
+
+		if strings.Contains(text, phrаse) {
+
+			res := FindAnyPhraseInFile(phrаse, text)
+
+			if (Result{}) != res {
+				result = res
+				break
+			}
+		}
+	}
+	log.Print(result)
+
+	wg.Add(1)
+	go func(ctx context.Context, ch chan<- Result) {
+		defer wg.Done()
+		if (Result{}) != result {
+			ch <- result
+		}
+	}(ctx, ch)
+
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+
+	return ch
 }
 
 // FindAnyPhraseInFile ...

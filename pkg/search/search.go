@@ -58,36 +58,6 @@ func All(ctx context.Context, phrаse string, files []string) <-chan []Result {
 	return ch
 }
 
-// FindAllPhraseInFile ...
-func FindAllPhraseInFile(phrase string, fileName string) []Result {
-	result := []Result{}
-
-	file, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		log.Print(err)
-		return result
-	}
-
-	text := string(file)
-
-	lines := strings.Split(text, "\n")
-
-	for i, line := range lines {
-		i++
-		if strings.Contains(line, phrase) {
-			r := Result{
-				Phrase:  phrase,
-				Line:    line,
-				LineNum: int64(i),
-				ColNum:  int64(strings.Index(line, phrase)) + 1,
-			}
-			result = append(result, r)
-		}
-	}
-
-	return result
-}
-
 // Any ищет любое одно вхождения pharse в текстовых файлах files.
 func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 	ch := make(chan Result)
@@ -126,10 +96,40 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 	go func() {
 		defer close(ch)
 		wg.Wait()
-		// cancel()
+		cancel()
 	}()
 
 	return ch
+}
+
+// FindAllPhraseInFile ...
+func FindAllPhraseInFile(phrase string, fileName string) []Result {
+	result := []Result{}
+
+	file, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		log.Print(err)
+		return result
+	}
+
+	text := string(file)
+
+	lines := strings.Split(text, "\n")
+
+	for i, line := range lines {
+		i++
+		if strings.Contains(line, phrase) {
+			r := Result{
+				Phrase:  phrase,
+				Line:    line,
+				LineNum: int64(i),
+				ColNum:  int64(strings.Index(line, phrase)) + 1,
+			}
+			result = append(result, r)
+		}
+	}
+
+	return result
 }
 
 // FindAnyPhraseInFile ...

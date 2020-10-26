@@ -138,16 +138,8 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 }
 
 // FindAnyPhraseInFile ...
-func FindAnyPhraseInFile(phrase string, fileName string) (result Result) {
-	// var result Result
-
-	file, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		log.Print(err)
-		return result
-	}
-
-	text := string(file)
+func FindAnyPhraseInFile(phrase string, text string) Result {
+	var result Result
 
 	lines := strings.Split(text, "\n")
 

@@ -62,23 +62,23 @@ func All(ctx context.Context, phrаse string, files []string) <-chan []Result {
 func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 	ch := make(chan Result)
 
-	var j int
-	for j = range files {
-		j++
-	}
+	// var j int
+	// for j = range files {
+	// 	j++
+	// }
 
 	wg := sync.WaitGroup{}
 
 	ctx, cancel := context.WithCancel(ctx)
 
-	for i := 0; i < j; i++ {
+	for i := 0; i < len(files); i++ {
 		wg.Add(1)
 		go func(ctx context.Context, fileName string, i int, ch chan<- Result) {
 			defer wg.Done()
 
 			select {
 			case <-ctx.Done():
-				log.Printf("canceled %v", i)
+				log.Println("canceled", i)
 				// return
 			default:
 				channel := FindAnyPhraseInFile(phrаse, fileName)

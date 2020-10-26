@@ -126,7 +126,7 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 	go func() {
 		defer close(ch)
 		wg.Wait()
-		cancel()
+		// cancel()
 	}()
 
 	return ch

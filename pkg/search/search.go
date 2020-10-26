@@ -108,16 +108,15 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 
 			select {
 			case <-ctx.Done():
-				log.Print("cancel")
+				log.Println("cancel")
 				return
 			default:
 				channel := FindAnyPhraseInFile(phrаse, fileName)
 
-				if (channel == Result{}) {
-					return
+				if (Result{} != channel) {
+					ch <- channel
 				}
 
-				ch <- channel
 			}
 
 		}(ctx, files[i], ch)
@@ -150,12 +149,12 @@ func FindAnyPhraseInFile(phrase string, fileName string) Result {
 	lines := strings.Split(text, "\n")
 
 	for i, line := range lines {
-		// i++
+		i++
 		if strings.Contains(line, phrase) {
 			return Result{
 				Phrase:  phrase,
 				Line:    line,
-				LineNum: int64(i + 1),
+				LineNum: int64(i),
 				ColNum:  int64(strings.Index(line, phrase)) + 1,
 			}
 		}

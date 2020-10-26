@@ -109,7 +109,7 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 			select {
 			case <-ctx.Done():
 				log.Println("cancel")
-				return
+				// return
 			default:
 				channel := FindAnyPhraseInFile(phrаse, fileName)
 

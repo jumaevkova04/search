@@ -116,9 +116,7 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 				if (Result{}) != channel {
 					ch <- channel
 				}
-
 			}
-
 		}(ctx, files[i], i, ch)
 	}
 
@@ -135,8 +133,8 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 }
 
 // FindAnyPhraseInFile ...
-func FindAnyPhraseInFile(phrase string, fileName string) Result {
-	var result Result
+func FindAnyPhraseInFile(phrase string, fileName string) (result Result) {
+	// var result Result
 
 	file, err := ioutil.ReadFile(fileName)
 	if err != nil {

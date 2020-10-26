@@ -103,23 +103,23 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 
 	for i := 0; i < j; i++ {
 		wg.Add(1)
-		go func(ctx context.Context, fileName string, ch chan<- Result) {
+		go func(ctx context.Context, fileName string, i int, ch chan<- Result) {
 			defer wg.Done()
 
 			select {
 			case <-ctx.Done():
-				log.Println("cancel")
+				log.Printf("canceled %v", i)
 				// return
 			default:
 				channel := FindAnyPhraseInFile(phrаse, fileName)
 
-				if (Result{} != channel) {
+				if (Result{}) != channel {
 					ch <- channel
 				}
 
 			}
 
-		}(ctx, files[i], ch)
+		}(ctx, files[i], i, ch)
 	}
 
 	<-ch

@@ -112,6 +112,11 @@ func Any(ctx context.Context, phrаse string, files []string) <-chan Result {
 				return
 			default:
 				channel := FindAnyPhraseInFile(phrаse, fileName)
+
+				if (channel == Result{}) {
+					return
+				}
+
 				ch <- channel
 			}
 
